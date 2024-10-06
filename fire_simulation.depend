@@ -1,5 +1,5 @@
 # depslib dependency file v1.0
-1728193686 source:c:\projetos\fire_simulation\main.c
+1728228764 source:c:\projetos\fire_simulation\main.c
 	<stdio.h>
 	<stdlib.h>
 	<pthread.h>
@@ -7,9 +7,9 @@
 	<locale.h>
 	"functions.h"
 
-1728192465 c:\projetos\fire_simulation\functions.h
+1728228743 c:\projetos\fire_simulation\functions.h
 
-1728193457 source:c:\projetos\fire_simulation\functions.c
+1728228750 source:c:\projetos\fire_simulation\functions.c
 	<stdio.h>
 	<stdlib.h>
 	<pthread.h>

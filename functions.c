@@ -11,6 +11,10 @@ extern pthread_cond_t fire_condition;
 extern pthread_mutex_t fire_mutex;
 extern pthread_mutex_t central_lock;
 
+int is_border_sensor(int x, int y) {
+    return (x == 0 || x == SIZE - 1 || y == 0 || y == SIZE - 1);
+}
+
 void display_forest() {
     pthread_mutex_lock(&central_lock);
     printf("Floresta:\n");
@@ -40,7 +44,6 @@ void* sensor_thread(void* arg) {
                 if (neighbor_x >= 0 && neighbor_x < SIZE && neighbor_y >= 0 && neighbor_y < SIZE) {
                     pthread_mutex_lock(&grid_mutex[neighbor_x][neighbor_y]);
                     if (forest_grid[neighbor_x][neighbor_y] == FIRE && !sensor_identified_fire[sensor->x][sensor->y]) {
-                        // Check if this sensor is the closest sensor to the fire
                         int closest_sensor_x = sensor->x;
                         int closest_sensor_y = sensor->y;
                         int min_distance = INT_MAX;
@@ -63,13 +66,11 @@ void* sensor_thread(void* arg) {
 
                             sensor_identified_fire[sensor->x][sensor->y] = 1;
 
-                            // Se o sensor for de borda, acione a central diretamente
                             if (is_border_sensor(sensor->x, sensor->y)) {
                                 pthread_mutex_lock(&fire_mutex);
                                 pthread_cond_signal(&fire_condition);
                                 pthread_mutex_unlock(&fire_mutex);
                             } else {
-                                // Alertar os vizinhos do sensor
                                 communicate_with_neighbors(sensor->x, sensor->y);
                             }
                         }
@@ -96,12 +97,10 @@ void communicate_with_neighbors(int x, int y) {
                     printf("O sensor [%d, %d] notificou sensor [%d, %d] sobre o incêndio!\n", x, y, neighbor_x, neighbor_y);
 
                     if (is_border_sensor(neighbor_x, neighbor_y)) {
-                        // Acionar a central de controle
                         pthread_mutex_lock(&fire_mutex);
                         pthread_cond_signal(&fire_condition);
                         pthread_mutex_unlock(&fire_mutex);
                     } else {
-                        // Alertar os vizinhos do sensor vizinho
                         communicate_with_neighbors(neighbor_x, neighbor_y);
                     }
                 }
@@ -158,10 +157,6 @@ void* control_center_thread(void* arg) {
     }
 
     return NULL;
-}
-
-int is_border_sensor(int x, int y) {
-    return (x == 0 || x == SIZE - 1 || y == 0 || y == SIZE - 1);
 }
 
 
